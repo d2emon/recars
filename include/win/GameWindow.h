@@ -26,7 +26,11 @@ struct Car
 
         float tx = points[n][0];
         float ty = points[n][1];
-        angle = atan2(tx-x, ty-y);
+        float beta = angle - atan2(tx-x, ty-y);
+        if (sin(beta) < 0)
+            angle += 0.08;
+        else
+            angle -= 0.08;
 
         if ((x-tx) * (x-tx) + (y-ty) * (y-ty) < 25*25)
             n = (n + 1) % num;
