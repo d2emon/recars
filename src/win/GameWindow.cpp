@@ -88,7 +88,9 @@ int GameWindow::run()
         x += sin(angle) * speed;
         y -= cos(angle) * speed;
 
-        car.setPosition(x, y);
+        bg.setPosition(-x, -y);
+
+        // car.setPosition(x, y);
         car.setRotation(angle * 180/3.141592);
 
         show();
