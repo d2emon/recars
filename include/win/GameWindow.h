@@ -1,9 +1,26 @@
 #ifndef GAMEWINDOW_H
 #define GAMEWINDOW_H
 
+#include <math.h>
+
 #include "D2Window.h"
 #include "Background.h"
 
+struct Car
+{
+    float x;
+    float y;
+    float speed;
+    float angle;
+
+    Car() {speed=2; angle=0;}
+
+    void move()
+    {
+        x += sin(angle) * speed;
+        y -= cos(angle) * speed;
+    }
+};
 
 class GameWindow : public D2Window
 {
@@ -13,7 +30,7 @@ class GameWindow : public D2Window
 
         Background bg;
         sf::Texture texture;
-        sf::Sprite car;
+        sf::Sprite carSprite;
 
         int grid[6][6];
 

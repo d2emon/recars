@@ -1,6 +1,5 @@
 #include "GameWindow.h"
 #include <time.h>
-#include <math.h>
 #include "settings.h"
 
 GameWindow::GameWindow(sf::RenderWindow &window): D2Window(window)
@@ -19,9 +18,9 @@ int GameWindow::load()
     if (!texture.loadFromFile("res/car.png"))
         return EXIT_FAILURE;
 
-    car.setTexture(texture);
-    car.setPosition(300, 300);
-    car.setOrigin(22, 22);
+    carSprite.setTexture(texture);
+    carSprite.setPosition(300, 300);
+    carSprite.setOrigin(22, 22);
 
     return 1;
 }
@@ -29,6 +28,15 @@ int GameWindow::load()
 int GameWindow::run()
 {
     load();
+
+    const int N=5;
+    Car car[N];
+    for (int i=0; i < N; i++)
+    {
+        car[i].x =  300 + i*50;
+        car[i].y = 1700 + i*80;
+        car[i].speed = 7 + i;
+    }
 
     float x=300;
     float y=300;
@@ -88,16 +96,39 @@ int GameWindow::run()
         if (Right && speed != 0) angle += turnSpeed * speed/maxSpeed;
         if (Left  && speed != 0) angle -= turnSpeed * speed/maxSpeed;
 
-        x += sin(angle) * speed;
-        y -= cos(angle) * speed;
+        car[0].speed = speed;
+        car[0].angle = angle;
 
-        if (x>320) offsetX = x - 320;
-        if (y>240) offsetY = y - 320;
+        for(int i=0; i < N; i++)
+            car[i].move();
+
+        if (car[0].x>320) offsetX = car[0].x - 320;
+        if (car[0].y>240) offsetY = car[0].y - 320;
 
         bg.setPosition(-offsetX, -offsetY);
 
-        car.setPosition(x - offsetX, y - offsetY);
-        car.setRotation(angle * 180/3.141592);
+        // Clear screen
+        window.clear();
+        window.draw(bg);
+
+        sf::Color colors[10] = {
+            sf::Color::Red,
+            sf::Color::Green,
+            sf::Color::Magenta,
+            sf::Color::Blue,
+            sf::Color::White
+        };
+
+        for (int i=0; i < N; i++)
+        {
+            carSprite.setPosition(car[i].x - offsetX, car[i].y - offsetY);
+            carSprite.setRotation(car[i].angle * 180/3.141592);
+
+            // Draw the sprite
+            carSprite.setColor(colors[i]);
+            window.draw(carSprite);
+        }
+
 
         show();
     }
@@ -107,14 +138,6 @@ int GameWindow::run()
 
 void GameWindow::show()
 {
-    // Clear screen
-    window.clear();
-    window.draw(bg);
-
-    // Draw the sprite
-    car.setColor(sf::Color::Red);
-    window.draw(car);
-
     // Update the window
     window.display();
 
