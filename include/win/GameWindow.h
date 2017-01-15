@@ -6,20 +6,30 @@
 #include "D2Window.h"
 #include "Background.h"
 
+const int num=3;
+extern int points[num][2];
+
 struct Car
 {
     float x;
     float y;
     float speed;
     float angle;
+    int n;
 
-    Car() {speed=2; angle=0;}
+    Car() {speed=2; angle=0; n=0;}
 
     void move()
     {
         x += sin(angle) * speed;
         y -= cos(angle) * speed;
-        angle += 0.08;
+
+        float tx = points[n][0];
+        float ty = points[n][1];
+        angle = atan2(tx-x, ty-y);
+
+        if ((x-tx) * (x-tx) + (y-ty) * (y-ty) < 25*25)
+            n = (n + 1) % num;
     }
 };
 

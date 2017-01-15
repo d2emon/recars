@@ -2,6 +2,13 @@
 #include <time.h>
 #include "settings.h"
 
+int points[num][2] = {
+    300, 1600,
+    600, 1600,
+    500, 1800,
+};
+
+
 GameWindow::GameWindow(sf::RenderWindow &window): D2Window(window)
 {
     // srand(time(0));
@@ -101,6 +108,23 @@ int GameWindow::run()
 
         for(int i=0; i < N; i++)
             car[i].move();
+
+        float R=22;
+
+        for (int i=0; i < N; i++)
+            for (int j=0; j < N; j++)
+            {
+                int dx = car[i].x - car[j].x;
+                int dy = car[i].y - car[j].y;
+                if (dx * dx + dy * dy < 4*R*R)
+                {
+                    car[i].x += dx/10;
+                    car[i].x += dy/10;
+                    car[j].x += dx/10;
+                    car[j].y += dy/10;
+                }
+                //
+            }
 
         if (car[0].x>320) offsetX = car[0].x - 320;
         if (car[0].y>240) offsetY = car[0].y - 320;
