@@ -39,6 +39,9 @@ int GameWindow::run()
     float dec=0.3;
     float turnSpeed=0.08;
 
+    int offsetX=0;
+    int offsetY=0;
+
 	// Start the game loop
     while (window.isOpen())
     {
@@ -88,9 +91,12 @@ int GameWindow::run()
         x += sin(angle) * speed;
         y -= cos(angle) * speed;
 
-        bg.setPosition(-x, -y);
+        if (x>320) offsetX = x - 320;
+        if (y>240) offsetY = y - 320;
 
-        // car.setPosition(x, y);
+        bg.setPosition(-offsetX, -offsetY);
+
+        car.setPosition(x - offsetX, y - offsetY);
         car.setRotation(angle * 180/3.141592);
 
         show();
