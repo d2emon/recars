@@ -13,7 +13,7 @@ class GameWindow : public D2Window
 
         Background bg;
         sf::Texture texture;
-        sf::Sprite sprite[20];
+        sf::Sprite car;
 
         int grid[6][6];
 

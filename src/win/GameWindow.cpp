@@ -1,10 +1,11 @@
 #include "GameWindow.h"
 #include <time.h>
+#include <math.h>
 #include "settings.h"
 
 GameWindow::GameWindow(sf::RenderWindow &window): D2Window(window)
 {
-    srand(time(0));
+    // srand(time(0));
     window.setFramerateLimit(60);
 }
 
@@ -15,18 +16,12 @@ GameWindow::~GameWindow()
 
 int GameWindow::load()
 {
-    if (!texture.loadFromFile("res/background.png"))
+    if (!texture.loadFromFile("res/car.png"))
         return EXIT_FAILURE;
 
-    int n=0;
-    for(int i=0; i < 4; i++)
-        for(int j=0; j < 4; j++)
-        {
-            n++;
-            sprite[n].setTexture(texture);
-            sprite[n].setTextureRect(sf::IntRect(i*spriteWidth, j*spriteWidth, spriteWidth, spriteWidth));
-            grid[i+1][j+1] = n;
-        }
+    car.setTexture(texture);
+    car.setPosition(300, 300);
+    car.setOrigin(22, 22);
 
     return 1;
 }
@@ -34,6 +29,15 @@ int GameWindow::load()
 int GameWindow::run()
 {
     load();
+
+    float x=300;
+    float y=300;
+    float speed=0;
+    float angle=0;
+    float maxSpeed=12.0;
+    float acc=0.2;
+    float dec=0.3;
+    float turnSpeed=0.08;
 
 	// Start the game loop
     while (window.isOpen())
@@ -46,40 +50,47 @@ int GameWindow::run()
             if (event.type == sf::Event::Closed ||
                 (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
                 window.close();
-
-            if (event.type == sf::Event::MouseButtonPressed)
-            {
-                if (event.key.code == sf::Mouse::Left)
-                {
-                    sf::Vector2i pos = sf::Mouse::getPosition(window);
-                    int x = pos.x / spriteWidth + 1;
-                    int y = pos.y / spriteWidth + 1;
-
-                    int dx=0;
-                    int dy=0;
-
-                    if (grid[x+1][y] == 16){dx =  1; dy =  0;}
-                    if (grid[x][y+1] == 16){dx =  0; dy =  1;}
-                    if (grid[x][y-1] == 16){dx =  0; dy = -1;}
-                    if (grid[x-1][y] == 16){dx = -1; dy =  0;}
-
-                    int n = grid[x][y];
-                    grid[x][y] = 16;
-                    grid[x+dx][y+dy] = n;
-
-                    sprite[16].move(-dx*spriteWidth, -dy*spriteWidth);
-                    float speed = 3;
-
-                    for (int i=0; i < spriteWidth; i += speed)
-                    {
-                        sprite[n].move(speed*dx, speed*dy);
-                        window.draw(sprite[16]);
-                        window.draw(sprite[n]);
-                        window.display();
-                    }
-                }
-            }
         }
+
+        bool Up=0;
+        bool Right=0;
+        bool Down=0;
+        bool Left=0;
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up   )) Up    = 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) Right = 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down )) Down  = 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left )) Left  = 1;
+
+        if (Up && speed<maxSpeed)
+            if(speed < 0)
+                speed += dec;
+            else
+                speed += acc;
+
+        if (Down && speed<maxSpeed)
+            if(speed < 0)
+                speed -= dec;
+            else
+                speed -= acc;
+
+        if (!Up && !Down)
+            if (speed - dec > 0)
+                speed -= dec;
+            else if (speed + dec < 0)
+                speed += dec;
+            else
+                speed = 0;
+
+        if (Right && speed != 0) angle += turnSpeed * speed/maxSpeed;
+        if (Left  && speed != 0) angle -= turnSpeed * speed/maxSpeed;
+
+        x += sin(angle) * speed;
+        y -= cos(angle) * speed;
+
+        car.setPosition(x, y);
+        car.setRotation(angle * 180/3.141592);
+
         show();
     }
 
@@ -92,16 +103,9 @@ void GameWindow::show()
     window.clear();
     window.draw(bg);
 
-    for(int i=0; i < 4; i++)
-        for(int j=0; j < 4; j++)
-        {
-            int n = grid[i+1][j+1];
-            sprite[n].setPosition(i*spriteWidth, j*spriteWidth);
-            window.draw(sprite[n]);
-        }
-
     // Draw the sprite
-    // window.draw(sprite);
+    car.setColor(sf::Color::Red);
+    window.draw(car);
 
     // Update the window
     window.display();
