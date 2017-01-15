@@ -3,9 +3,14 @@
 #include "settings.h"
 
 int points[num][2] = {
-    300, 1600,
-    600, 1600,
-    500, 1800,
+    300, 610,
+    1270,430,
+    1380,2380,
+    1900,2460,
+    1970,1700,
+    2550,1680,
+    2560,3150,
+    500, 3300
 };
 
 
@@ -24,6 +29,7 @@ int GameWindow::load()
 {
     if (!texture.loadFromFile("res/car.png"))
         return EXIT_FAILURE;
+    texture.setSmooth(true);
 
     carSprite.setTexture(texture);
     carSprite.setPosition(300, 300);
@@ -36,6 +42,8 @@ int GameWindow::run()
 {
     load();
 
+    float R=22;
+
     const int N=5;
     Car car[N];
     for (int i=0; i < N; i++)
@@ -45,8 +53,8 @@ int GameWindow::run()
         car[i].speed = 7 + i;
     }
 
-    float x=300;
-    float y=300;
+    // float x=300;
+    // float y=300;
     float speed=0;
     float angle=0;
     float maxSpeed=12.0;
@@ -86,8 +94,8 @@ int GameWindow::run()
             else
                 speed += acc;
 
-        if (Down && speed<maxSpeed)
-            if(speed < 0)
+        if (Down && speed>-maxSpeed)
+            if(speed > 0)
                 speed -= dec;
             else
                 speed -= acc;
@@ -109,25 +117,31 @@ int GameWindow::run()
         for(int i=0; i < N; i++)
             car[i].move();
 
-        float R=22;
+        for(int i=1; i < N; i++)
+            car[i].findTarget();
 
         for (int i=0; i < N; i++)
             for (int j=0; j < N; j++)
             {
-                int dx = car[i].x - car[j].x;
-                int dy = car[i].y - car[j].y;
-                if (dx * dx + dy * dy < 4*R*R)
+                int dx = 0; // car[i].x - car[j].x;
+                int dy = 0; // car[i].y - car[j].y;
+                while (dx * dx + dy * dy < 4*R*R)
                 {
                     car[i].x += dx/10;
                     car[i].x += dy/10;
-                    car[j].x += dx/10;
-                    car[j].y += dy/10;
+                    car[j].x -= dx/10;
+                    car[j].y -= dy/10;
+
+                    dx = car[i].x - car[j].x;
+                    dx = car[i].x - car[j].x;
+
+                    if (!dx || !dy) break;
                 }
                 //
             }
 
         if (car[0].x>320) offsetX = car[0].x - 320;
-        if (car[0].y>240) offsetY = car[0].y - 320;
+        if (car[0].y>240) offsetY = car[0].y - 240;
 
         bg.setPosition(-offsetX, -offsetY);
 

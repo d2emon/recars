@@ -13,5 +13,7 @@ Background::Background()
 {
     if (texture.loadFromFile(bgFile()))
         setTexture(texture);
-    //ctor
+
+    texture.setSmooth(true);
+    scale(2, 2);
 }
